@@ -101,7 +101,7 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=50, shuffle=False, 
 # Return network & file name
 def getNetwork(args):
     # if you want to implement more architectures
-    net = Wide_ResNet_BatchEnsemble_vae2(args.depth, args.widen_factor, args.dropout, num_classes,num_models=ensemble_size)
+    net = Wide_ResNet_LPBNN(args.depth, args.widen_factor, args.dropout, num_classes,num_models=ensemble_size)
     file_name = 'wide-resnet-'+str(args.depth)+'x'+str(args.widen_factor)
 
     return net, file_name

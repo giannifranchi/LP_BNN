@@ -98,9 +98,9 @@ class wide_basic(nn.Module):
 
         return out
 
-class Wide_ResNet_BatchEnsemble_vae2(nn.Module):
+class Wide_ResNet_LPBNN(nn.Module):
     def __init__(self, depth, widen_factor, dropout_rate, num_classes,num_models):
-        super(Wide_ResNet_BatchEnsemble_vae2, self).__init__()
+        super(Wide_ResNet_LPBNN, self).__init__()
         self.in_planes = 16
         self.num_models = num_models
         assert ((depth-4)%6 ==0), 'Wide-resnet depth should be 6n+4'
