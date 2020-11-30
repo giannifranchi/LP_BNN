@@ -78,7 +78,7 @@ def getNetwork(args):
         print('| Building net type [wide-resnet BE]...')
     elif (args.algo == 'LPBNN'):
 
-        net = Wide_ResNet_LPBNN(args.depth, args.widen_factor, args.dropout, num_classes, num_models=ensemble_size)
+        net = Wide_ResNet_BatchEnsemble_vae2(args.depth, args.widen_factor, args.dropout, num_classes, num_models=ensemble_size)
         name_algo= 'LP-BNN'
         print('| Building net type [wide-resnet LB-BNN]...')
     else:
