@@ -38,7 +38,7 @@ args = parser.parse_args()
 # Hyper Parameter settings
 use_cuda = torch.cuda.is_available()
 best_acc = 0
-nb_models = 1 # For better statistical results you should test on several model not just one!
+nb_models = 3 # For better statistical results you should test on several model not just one!
 ensemble_size =4
 start_epoch, num_epochs, batch_size, optim_type = cf.start_epoch, cf.num_epochs, cf.batch_size, cf.optim_type
 
