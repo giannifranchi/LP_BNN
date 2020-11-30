@@ -29,7 +29,7 @@ parser.add_argument('--net_type', default='wide-resnet', type=str, help='model')
 parser.add_argument('--depth', default=28, type=int, help='depth of model')
 parser.add_argument('--widen_factor', default=10, type=int, help='width of model')
 parser.add_argument('--dropout', default=0.3, type=float, help='dropout_rate')
-parser.add_argument('--Algo', default='LPBNN', type=str, help=' choose between LPBNN or BE')
+parser.add_argument('--algo', default='LPBNN', type=str, help=' choose between LPBNN or BE')
 parser.add_argument('--dataset', default='cifar10', type=str, help='dataset = [cifar10/cifar100]')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--testOnly', '-t', action='store_true', help='Test mode with the saved model')
@@ -71,12 +71,12 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=150, shuffle=False,
 testloader_OOD = torch.utils.data.DataLoader(testset_OOD, batch_size=150, shuffle=False, num_workers=2)
 # Return network & file name
 def getNetwork(args):
-    if (args.Algo == 'BE'):
+    if (args.algo == 'BE'):
 
         net = Wide_ResNet_BatchEnsemble(args.depth, args.widen_factor, args.dropout, num_classes,num_models=ensemble_size)
         name_algo= 'BatchEnsemble'
         print('| Building net type [wide-resnet BE]...')
-    elif (args.Algo == 'LPBNN'):
+    elif (args.algo == 'LPBNN'):
 
         net = Wide_ResNet_LPBNN(args.depth, args.widen_factor, args.dropout, num_classes, num_models=ensemble_size)
         name_algo= 'LP-BNN'
@@ -102,12 +102,6 @@ global_path=args.dirsave_out
 
 # Model
 print('\n[Phase 2] : Model setup')
-if args.resume:
-    # Load checkpoint
-    print('| Resuming from checkpoint not implemented sorry! ...')
-
-else:
-    net, file_name = getNetwork(args)
 
 
 if use_cuda:
@@ -201,7 +195,7 @@ for step in range(nb_models):
     checkpoint_PATH = global_path+str(step) + os.sep + file_name + '.t7'
     print('loading ', step, ' =>', checkpoint_PATH)
     checkpoint = torch.load(checkpoint_PATH)
-    net = checkpoint['ema']
+    net = checkpoint['net']
     net.cuda()
     output, target = test(net, testloader_OOD)
 
@@ -228,12 +222,12 @@ for step in range(nb_models):
 
     #output_proba_score0 = output_proba
     output_proba_score0 = scores.clone().cpu().data.numpy()
-    output_proba_score_NOTMNIST = output_proba_score0
+    output_proba_score_NOTINDISTRIB = output_proba_score0
 
 
     print('time 1 : ', time.time() - t)
 
-    _ = plt.hist(output_proba_score_NOTMNIST, bins=20)
+    _ = plt.hist(output_proba_score_NOTINDISTRIB, bins=20)
     plt.title("Histogram with 'auto' bins")
 
     plt.savefig('Histogram_OOD_'+name_algo+'.png')
@@ -243,7 +237,7 @@ for step in range(nb_models):
                                             shuffle=False, num_workers=2)'''
 
     h5f = h5py.File('result_ODD_'+name_algo+'.hdf5', 'w')
-    h5f.create_dataset('proba_score', data=output_proba_score_NOTMNIST)
+    h5f.create_dataset('proba_score', data=output_proba_score_NOTINDISTRIB)
 
     h5f.close()
 
@@ -290,7 +284,7 @@ for step in range(nb_models):
     # target_onehot = one_hot.scatter_(1, target, 1)
 
     correct = pred.eq(target.view_as(pred)).sum().item()
-    correct_MNIST=(pred.eq(target.view_as(pred))).clone().cpu().data.numpy()
+
 
     scores, _ = output_proba.max(1)
     scores = scores.view(-1)
@@ -312,9 +306,13 @@ for step in range(nb_models):
 
     #output_proba_score0=output_proba
     output_proba_score0=scores.clone().cpu().data.numpy()
-    output_proba_score_MNIST=output_proba_score0
+    output_proba_score_INDISTRIB=output_proba_score0
     correct_list.append(correct)
+    _ = plt.hist(output_proba_score_INDISTRIB, bins=20)
+    plt.title("Histogram with 'auto' bins")
 
+    plt.savefig('Histogram_ID_'+name_algo+'.png')
+    plt.close()
 
 
     print('time 2 :',time.time()-t)
