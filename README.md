@@ -23,9 +23,9 @@ to be able to use our code.
 After you have cloned the repository, you can train each dataset of either cifar10, cifar100 by running the script below.
 To have better results we advise you to perform several trainings(minimum 3).
 ```bash
- python main_BatchEnsemble.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T0
- python main_BatchEnsemble.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T1
- python main_BatchEnsemble.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T2
+ python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T0
+ python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T1
+ python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T2
 ```
 
 ## How to train the Deep Neural Network with LP-BNN BatchEnsemble
