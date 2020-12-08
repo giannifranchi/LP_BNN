@@ -4,8 +4,8 @@ LP-BNN CIFAR-10, CIFAR-100 official implementation using PyTorch
 BatchEnsemble CIFAR-10, CIFAR-100 **unofficial** implementation using PyTorch
 
 Please if you use this code please cite the following papers:
-- LP-BNN
-- BatchEnsemble
+- [LP-BNN](https://arxiv.org/abs/2012.02818)
+- [BatchEnsemble](https://arxiv.org/abs/2002.06715)
 - [Wide Residual Networks](https://arxiv.org/pdf/1605.07146v2.pdf)
 
 
