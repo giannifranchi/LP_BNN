@@ -71,8 +71,8 @@ Below is the result of the test set accuracy for **CIFAR-10 dataset** training.
 
 | network           | Accuracy (%)  | AUC | AUPR | FPR-95-TPR | ECE  (%)   | cA(%) |cE (%) |
 |:-----------------:|:-------:|:----------:|:-----:|:-----:|:------------:|:-----------:|:-----------:|
-| LP-BNN |    **96.48**    |  0.9540   | 0.9731 |   0.132   | 0.0167 |   47.44   | 0.2909    |
-| BatchEnsemble |    95.02    |   **0.9691**  | **0.9836** |   **0.103**   | **0.0094** |    **69.51**    |  0.2324     |
+| BatchEnsemble |    **96.48**    |  0.9540   | 0.9731 |   0.132   | 0.0167 |   47.44   | 0.2909    |
+| LP-BNN  |    95.02    |   **0.9691**  | **0.9836** |   **0.103**   | **0.0094** |    **69.51**    |  0.2324     |
 
 
 If you are interrested about the corrupted accuraccy and corrupted expected calibration error please download the dataset from
