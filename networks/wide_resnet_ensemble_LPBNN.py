@@ -64,15 +64,9 @@ class wide_basic_ensemble(nn.Module):
 
     def forward(self, x):
         curr_bs = x.size(0)
-        '''makeup_bs = abs(self.num_models - curr_bs)
-        indices = torch.randint(
-            high=self.num_models,
-            size=(curr_bs,), device=self.conv1.conv.weight.device)'''
 
         out = self.dropout(self.conv1(F.relu(self.bn1(x))))
         out = self.conv2(F.relu(self.bn2(out)))
-        '''out = self.dropout(self.conv1(F.relu(x)))
-        out = self.conv2(F.relu(out))'''
         out += self.shortcut(x)
 
         return out
@@ -111,25 +105,13 @@ class Wide_ResNet_LPBNN(nn.Module):
         nStages = [16, 16*k, 32*k, 64*k]
 
         self.conv1 = conv3x3(3,nStages[0], stride=1,first_layer=True, num_models=num_models)
-        '''self.layer1 = self._wide_layer(wide_basic, nStages[1], n, dropout_rate, stride=1,num_models=num_models)
-        self.layer2 = self._wide_layer(wide_basic, nStages[2], n, dropout_rate, stride=2,num_models=num_models)
-        self.layer3 = self._wide_layer(wide_basic, nStages[3], n, dropout_rate, stride=2,num_models=num_models)'''
+
         self.layer1 = self._wide_layer(wide_basic_ensemble, nStages[1], n, dropout_rate, stride=1,num_models=num_models)
         self.layer2 = self._wide_layer(wide_basic_ensemble, nStages[2], n, dropout_rate, stride=2,num_models=num_models)
         self.layer3 = self._wide_layer(wide_basic_ensemble, nStages[3], n, dropout_rate, stride=2,num_models=num_models)
         self.bn1 = Ensemble_BatchNorm2d(nStages[3], num_models=num_models) #nn.BatchNorm2d(nStages[3], momentum=0.9)
-        #self.linear = nn.Linear(nStages[3], num_classes)
         self.linear =Ensemble_orderFC(nStages[3], num_classes, num_models, False) #Ensemble_FC(nStages[3], num_classes, False, num_models)
-        self.fcs = [self.linear]
         self.num_classes = num_classes
-        #.convs = [self.conv1, self.layer1,self.layer2,self.layer3]
-        #print('IMPORTANTNNNNNNN',self.layer1.__dict__)
-        self.convs = [self.conv1,self.layer1[0].conv1,self.layer1[0].conv2,self.layer1[1].conv1,self.layer1[1].conv2,
-                      self.layer1[2].conv1,self.layer1[2].conv2,self.layer1[3].conv1,self.layer1[3].conv2,
-                      self.layer2[0].conv1,self.layer2[0].conv2,self.layer2[1].conv1,self.layer2[1].conv2,
-                      self.layer2[2].conv1,self.layer2[2].conv2,self.layer2[3].conv1,self.layer2[3].conv2,
-                      self.layer3[0].conv1,self.layer3[0].conv2,self.layer3[1].conv1,self.layer3[1].conv2,
-                      self.layer3[2].conv1,self.layer3[2].conv2,self.layer3[3].conv1,self.layer3[3].conv2]
 
 
     def _wide_layer(self, block, planes, num_blocks, dropout_rate, stride,num_models):
@@ -143,15 +125,6 @@ class Wide_ResNet_LPBNN(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        curr_bs = x.size(0)
-        '''makeup_bs = abs(self.num_models - curr_bs)
-        indices = torch.randint(
-            high=self.num_models,
-            size=(curr_bs,), device=self.linear.fc.weight.device)
-        for m_fc in self.fcs:
-            m_fc.update_indices(indices)
-        for m_conv in self.convs:
-            m_conv.update_indices(indices)'''
         out = self.conv1(x)
         out = self.layer1(out)
         out = self.layer2(out)
@@ -167,7 +140,7 @@ class Wide_ResNet_LPBNN(nn.Module):
         return out
 
 if __name__ == '__main__':
-    net=Wide_ResNet_BatchEnsemble_4(28, 10, 0.3, 10)
+    net=Wide_ResNet_LPBNN(28, 10, 0.3, 10)
     y = net(Variable(torch.randn(1,3,32,32)))
 
     print(y.size())
