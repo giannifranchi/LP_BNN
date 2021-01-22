@@ -232,7 +232,6 @@ def test(epoch):
                 inputs, targets = inputs.cuda(), targets.cuda()
             inputs, targets = Variable(inputs), Variable(targets)
             outputs = net(inputs)
-            #print('GIANNI',outputs.size(),inputs.size(),targets.size())
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
