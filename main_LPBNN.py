@@ -39,7 +39,7 @@ ensemble_size=4
 use_cuda = torch.cuda.is_available()
 best_acc = 0
 start_epoch, num_epochs, batch_size, optim_type = cf.start_epoch, cf.num_epochs, cf.batch_size, cf.optim_type
-batch_size=128
+
 # Data Uplaod
 cutout=16
 class CutoutDefault(object):
@@ -94,7 +94,7 @@ elif(args.dataset == 'cifar100'):
     trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
     testset = torchvision.datasets.CIFAR100(root='./data', train=False, download=False, transform=transform_test)
     num_classes = 100
-
+print('batch_size=',batch_size)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
 testloader = torch.utils.data.DataLoader(testset, batch_size=50, shuffle=False, num_workers=2)
 
@@ -176,7 +176,7 @@ def tile(a, dim, n_tile):
 my_list = ['alpha', 'gamma']
 
 
-
+scaler = torch.cuda.amp.GradScaler()
 params_multi_tmp= list(filter(lambda kv: (my_list[0] in kv[0]) or (my_list[1] in kv[0]) , net.named_parameters()))
 param_core_tmp = list(filter(lambda kv: (my_list[0] not in kv[0]) and (my_list[1] not in kv[0]), net.named_parameters()))
 params_multi=[param for name, param in params_multi_tmp]
@@ -196,16 +196,28 @@ def train(epoch):
 
     print('\n=> Training Epoch #%d, LR=%.4f' %(epoch, cf.learning_rate(args.lr, epoch)))
     for batch_idx, (inputs, targets) in enumerate(trainloader):
-        inputs=tile(inputs,0,ensemble_size)
-        targets=tile(targets,0,ensemble_size)
+
+        inputs= torch.cat([inputs for i in range(ensemble_size)], dim=0)
+        targets = torch.cat([targets for i in range(ensemble_size)], dim=0)
+
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda() # GPU settings
         optimizer.zero_grad()
-        inputs, targets = Variable(inputs), Variable(targets)
-        outputs = net(inputs)               # Forward Propagation
-        loss = criterion(outputs, targets)  + mu_div*loss_latent_from_nn(net)# Loss
-        loss.backward()  # Backward Propagation
-        optimizer.step() # Optimizer update
+        with torch.cuda.amp.autocast():
+            inputs, targets = Variable(inputs), Variable(targets)
+            outputs = net(inputs)               # Forward Propagation
+            loss = criterion(outputs, targets)  + mu_div*loss_latent_from_nn(net)# Loss
+
+        # Scales the loss, and calls backward()
+        # to create scaled gradients
+        scaler.scale(loss).backward()
+
+        # Unscales gradients and calls
+        # or skips optimizer.step()
+        scaler.step(optimizer)
+
+        # Updates the scale for next iteration
+        scaler.update()
 
         train_loss += loss.item()
         _, predicted = torch.max(outputs.data, 1)
@@ -227,7 +239,7 @@ def test(epoch):
     total = 0
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
-            #inputs=torch.cat([inputs for idx in range(ensemble_size)],dim=0)
+
             if use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
             inputs, targets = Variable(inputs), Variable(targets)

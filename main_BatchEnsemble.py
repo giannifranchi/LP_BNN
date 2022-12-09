@@ -37,7 +37,7 @@ ensemble_size=4
 use_cuda = torch.cuda.is_available()
 best_acc = 0
 start_epoch, num_epochs, batch_size, optim_type = cf.start_epoch, cf.num_epochs, cf.batch_size, cf.optim_type
-batch_size=128#128
+
 # Data Uplaod
 cutout=16
 class CutoutDefault(object):
@@ -194,8 +194,8 @@ def train(epoch):
 
     print('\n=> Training Epoch #%d, LR=%.4f' %(epoch, cf.learning_rate(args.lr, epoch)))
     for batch_idx, (inputs, targets) in enumerate(trainloader):
-        inputs=tile(inputs,0,ensemble_size)
-        targets=tile(targets,0,ensemble_size)
+        inputs = torch.cat([inputs for i in range(ensemble_size)], dim=0)
+        targets = torch.cat([targets for i in range(ensemble_size)], dim=0)
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda() # GPU settings
         optimizer.zero_grad()
@@ -225,12 +225,12 @@ def test(epoch):
     total = 0
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
-            #inputs=torch.cat([inputs for idx in range(ensemble_size)],dim=0)
+
             if use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
             inputs, targets = Variable(inputs), Variable(targets)
             outputs = net(inputs)
-            #print('GIANNI',outputs.size(),inputs.size(),targets.size())
+
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
