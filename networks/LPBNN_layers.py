@@ -72,7 +72,7 @@ class Ensemble_FC(EnsembleModule):
     def forward(self, x):
         embedded=F.relu(self.encoder_fc1(self.alpha))
         #embedded, _ = self.rnn(embedded.view(len(self.alpha), 1, -1))
-        embedded_mean, embedded_logvar=self.encoder_fcmean(embedded),self.encoder_fcmean(embedded)
+        embedded_mean, embedded_logvar=self.encoder_fcmean(embedded),self.encoder_fcvar(embedded)
         z_embedded = self.reparameterize(embedded_mean, embedded_logvar)
         alpha_decoded = self.decoder_fc1(z_embedded)
         if self.training:
@@ -209,7 +209,7 @@ class Ensemble_orderFC(EnsembleModule):
     def forward(self, x):
         embedded=F.relu(self.encoder_fc1(self.alpha))
         #embedded, _ = self.rnn(embedded.view(len(self.alpha), 1, -1))
-        embedded_mean, embedded_logvar = self.encoder_fcmean(embedded), self.encoder_fcmean(embedded)
+        embedded_mean, embedded_logvar = self.encoder_fcmean(embedded), self.encoder_fcvar(embedded)
         z_embedded = self.reparameterize(embedded_mean, embedded_logvar)
         #print(z_embedded,', mean =>',embedded_mean,', var =>',embedded_logvar.exp_())
         alpha_decoded = self.decoder_fc1(z_embedded)
@@ -348,7 +348,7 @@ class Ensemble_Conv2d(EnsembleModule):
     def forward(self, x):
         embedded=F.relu(self.encoder_fc1(self.alpha))
         #embedded, _ = self.rnn(embedded.view(len(self.alpha), 1, -1))
-        embedded_mean, embedded_logvar = self.encoder_fcmean(embedded), self.encoder_fcmean(embedded)
+        embedded_mean, embedded_logvar = self.encoder_fcmean(embedded), self.encoder_fcvar(embedded)
         z_embedded = self.reparameterize(embedded_mean, embedded_logvar)
         alpha_decoded = self.decoder_fc1(z_embedded)
 

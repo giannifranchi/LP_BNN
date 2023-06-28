@@ -23,9 +23,9 @@ to be able to use our code.
 After you have cloned the repository, you can train each dataset of either cifar10, cifar100 by running the script below.
 To have better results we advise you to perform several trainings(minimum 3).
 ```bash
- python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T0
- python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T1
- python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out BE_C10_T2
+ python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out LPBNN_C10_T0
+ python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out LPBNN_C10_T1
+ python main_LPBNN.py --dataset [cifar10/cifar100] --dirsave_out LPBNN_C10_T2
 ```
 
 ## How to train the Deep Neural Network with LP-BNN BatchEnsemble
@@ -42,7 +42,7 @@ here are the comand line to test for CIFAR10.
 For CIFAR100 please adapt the code 
 ```bash
  python  evaluate_uncertainty.py --algo 'BE' --dataset cifar10 --dirsave_out './checkpoint/cifar10/BE_C10_T'
- python  evaluate_uncertainty.py --algo 'LPBNN' --dataset cifar10 --dirsave_out './checkpoint/cifar10/LBPNN_C10_T'
+ python  evaluate_uncertainty.py --algo 'LPBNN' --dataset cifar10 --dirsave_out './checkpoint/cifar10/LPBNN_C10_T'
 ```
 
 ## Implementation Details
@@ -69,10 +69,10 @@ Below is the result of the test set accuracy for **CIFAR-10 dataset** training.
 
 **Accuracy is the average of 3 runs**
 
-| network           | Accuracy (%)  | AUC | AUPR | FPR-95-TPR | ECE  (%)   | cA(%) |cE (%) |
-|:-----------------:|:-------:|:----------:|:-----:|:-----:|:------------:|:-----------:|:-----------:|
-| BatchEnsemble |    **96.48**    |  0.9540   | 0.9731 |   0.132   | 0.0167 |   47.44   | 0.2909    |
-| LP-BNN  |    95.02    |   **0.9691**  | **0.9836** |   **0.103**   | **0.0094** |    **69.51**    |  0.2324     |
+| network           | Accuracy (%) |    AUC     | AUPR | FPR-95-TPR | ECE  (%)   |   cA(%)   | cE (%) |
+|:-----------------:|:------------:|:----------:|:-----:|:----------:|:------------:|:---------:|:------:|
+| BatchEnsemble |  **96.48**   |   0.9540   | 0.9731 |   0.132    | 0.0167 |   47.44   | 0.2909 |
+| LP-BNN  |    94.76     | **0.9670** | **0.9812** | **0.104**  | **0.0148** | **69.92** | 0.2421 |
 
 
 If you are interrested about the corrupted accuraccy and corrupted expected calibration error please download the dataset from
